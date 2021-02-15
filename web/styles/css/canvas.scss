@@ -5,9 +5,23 @@
     width: 320px;
     height: 240px;
 }
-//小画布样式 
+//小画布样式
 .small-canvas {
     background-color: #ccc;
     width: 320px;
     height: 240px;
+}
+
+//小视频样式
+.big-video {
+    background: #222;
+    margin: 0 0 20px 0;
+    width: 640px;
+    height: 480px;
+}
+//小画布样式
+.big-canvas {
+    background-color: #ccc;
+    width: 640px;
+    height: 480px;
 }
