@@ -1,6 +1,9 @@
 //引用webpack
 const webpack = require('webpack');
 const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+
 
 //模块导出
 module.exports = {
@@ -33,15 +36,19 @@ module.exports = {
   //输出文件配置
   output: {
     //输出路径 __dirname表示当前目录
-    path: __dirname + '/dist',
+    path: path.resolve(__dirname,'dist'),
     //公共路径为项目根目录
     publicPath: '/',
     //打包后输出文件名
-    filename: 'samples.js'
+    filename: 'bundle.js'
   },
   //webpack插件
   plugins: [
     //热加载插件
+    // new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, "src", "index.html")
+    }),
     new webpack.HotModuleReplacementPlugin(),
   ],
   //开发服务器配置
@@ -50,7 +57,5 @@ module.exports = {
     contentBase: './dist',
     //是否热加载
     hot: true,
-    //加载IP地址
-    host: '0.0.0.0',
   }
 };
