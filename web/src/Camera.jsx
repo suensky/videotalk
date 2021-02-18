@@ -1,5 +1,6 @@
 import React from "react";
 import { Button, Select, message } from "antd"
+import SoundMeter from './lib/soundmeter';
 
 const { Option } = Select;
 
@@ -80,6 +81,11 @@ class Camera extends React.Component {
         this.video = null;
         this.audio = null;
         this.stream = null;
+        this.soundMeter = null;
+        this.state = {
+            //音量值
+            audioLevel: 0,
+        }
     }
 
     openCamera = async (e) => {
@@ -96,6 +102,32 @@ class Camera extends React.Component {
         }
         await this.tryGetUserMedia(constraints);
         this.handleAudio(this.stream);
+    }
+
+    testVolume = async (e) => {
+        try {
+            window.AudioContext = window.AudioContext || window.webkitAudioContext;
+            window.audioContext = new AudioContext();
+        } catch (e) {
+            console.log('Audio API is not supported.');
+        }
+
+        this.soundMeter = window.soundMeter = new SoundMeter(window.audioContext);
+
+        const constraints = window.constraints = {
+            audio: true,
+            video: false
+        };
+        await this.tryGetUserMedia(constraints);
+        window.stream = this.stream;
+        soundMeter.connectToSource(this.stream);
+        setTimeout(this.soundMeterProcess, 100);
+    }
+
+    soundMeterProcess = () => {
+        var val = (window.soundMeter.instant.toFixed(2) * 348) + 1;
+        this.setState({ audioLevel: val });
+        setTimeout(this.soundMeterProcess, 100);
     }
 
     stopStream = async (e) => {
@@ -204,7 +236,7 @@ class Camera extends React.Component {
                 <h1><span>Use camera</span></h1>
                 <video className="video" ref="video" autoPlay playsInline></video>
                 <div className="container">
-                    <Select defaultValue="p720p" style={{ width: '100px', marginLeft: '20px' }}
+                    <Select defaultValue="p720p" style={{ width: '100px' }}
                         onChange={this.handleResolutionChange}>
                         <Option value="p240p">240p</Option>
                         <Option value="p480p">480p</Option>
@@ -216,10 +248,24 @@ class Camera extends React.Component {
                     <Button onClick={this.changeResolution} style={{ marginLeft: '20px' }}>Dynamic resolution</Button>
                 </div>
                 <audio ref="audio" controls autoPlay></audio>
+                <div className="container">
+                    <h1>
+                        <span>Audio volume</span>
+                    </h1>
+                    <div style={{
+                        width: this.state.audioLevel + 'px',
+                        height: '10px',
+                        backgroundColor: '#8dc63f',
+                        marginTop: '20px',
+                    }}>
+                    </div>
+                    <span hidden={this.state.audioLevel < 1.1}>{this.state.audioLevel}</span>
+                </div>
                 <p className="warning">Warning: please wear headphones to avoid echo.</p>
                 <div className="container">
                     <Button onClick={this.openCamera}>Open camera</Button>
                     <Button onClick={this.openAudio}>Open audio</Button>
+                    <Button onClick={this.testVolume}>Test volume</Button>
                     <Button onClick={this.stopStream}>Stop</Button>
                 </div>
             </div>
